@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediCare AI - Medical Assistant</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+            border-radius: 10px;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 font-sans h-screen flex flex-col overflow-hidden">
+
+    <header class="h-16 border-b border-slate-200 bg-white px-6 md:px-12 flex items-center justify-between shrink-0 shadow-sm z-10">
+        <div class="flex items-center gap-3">
+            <div class="bg-teal-600 p-2.5 rounded-xl flex items-center justify-center text-white shadow-md shadow-teal-600/10">
+                <i class="fa-solid fa-user-doctor text-lg"></i>
+            </div>
+            <div>
+                <h2 class="text-base font-bold text-slate-800 tracking-tight">MediCare AI Assistant</h2>
+                <p class="text-xs text-slate-400 font-medium">Verified Clinical Information System</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-4">
+            <button onclick="clearChat()" class="text-xs text-slate-500 hover:text-teal-600 font-medium transition cursor-pointer flex items-center gap-1.5">
+                <i class="fa-solid fa-arrow-rotate-left"></i> Clear Conversation
+            </button>
+        </div>
+    </header>
+
+    <main id="chatWindow" class="flex-1 overflow-y-auto px-6 py-6 md:px-24 md:py-8 space-y-6 custom-scrollbar max-w-5xl w-full mx-auto">
+        
+        <div class="flex items-start gap-3 max-w-3xl mr-auto">
+            <div class="h-9 w-9 rounded-xl bg-teal-50 border border-teal-100 text-teal-600 flex items-center justify-center shadow-sm shrink-0">
+                <i class="fa-solid fa-robot text-sm"></i>
+            </div>
+            <div class="space-y-1">
+                <div class="bg-white border border-slate-200 rounded-2xl rounded-tl-none p-4 shadow-sm text-sm text-slate-700 leading-relaxed">
+                    Hello. Welcome to the medical information assistant. You can query clinical terminology, ask about symptoms, or request structural definitions from our local reference database. How can I assist you with health insights today?
+                </div>
+                <span class="text-[10px] text-slate-400 px-1 font-semibold tracking-wide uppercase">AI Health Bot</span>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="p-4 bg-white border-t border-slate-200">
+        <div class="max-w-4xl mx-auto">
+            <form id="chatForm" onsubmit="sendMessage(event)" class="flex gap-2 bg-slate-50 border border-slate-200 rounded-xl p-1.5 focus-within:border-teal-500 focus-within:bg-white focus-within:shadow-md transition duration-200">
+                <input 
+                    type="text" 
+                    id="userMessage" 
+                    placeholder="Ask a medical or diagnostic question..." 
+                    autocomplete="off"
+                    class="flex-1 bg-transparent px-3 py-2 text-sm text-slate-800 placeholder-slate-400 focus:outline-none"
+                >
+                <button 
+                    type="submit" 
+                    class="bg-teal-600 hover:bg-teal-700 text-white px-5 py-2 rounded-lg text-sm font-semibold transition flex items-center gap-1.5 shadow-md shadow-teal-600/10 active:scale-95 cursor-pointer"
+                >
+                    <span>Send Query</span>
+                    <i class="fa-solid fa-paper-plane text-xs"></i>
+                </button>
+            </form>
+            <p class="text-center text-[10px] text-slate-400 mt-2 tracking-wide">
+                Important Notice: This clinical AI engine provides automated data referencing. It does not replace professional medical evaluations.
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        let msgIndex = 0;
+
+        function sendMessage(event) {
+            event.preventDefault();
+            
+            const inputElement = document.getElementById('userMessage');
+            const chatWindow = document.getElementById('chatWindow');
+            const userText = inputElement.value.trim();
+            
+            if (!userText) return;
+            
+            inputElement.value = '';
+            
+            const userHTML = `
+                <div class="flex items-start gap-3 max-w-3xl ml-auto flex-row-reverse animate-fade-in">
+                    <div class="h-9 w-9 rounded-xl bg-slate-800 text-white flex items-center justify-center shadow-md shrink-0">
+                        <i class="fa-solid fa-user text-sm"></i>
+                    </div>
+                    <div class="space-y-1 text-right">
+                        <div class="bg-teal-600 text-white rounded-2xl rounded-tr-none p-4 shadow-md text-sm text-left leading-relaxed">
+                            ${userText}
+                        </div>
+                        <span class="text-[10px] text-slate-400 px-1 font-semibold tracking-wide uppercase">Patient Inquiry</span>
+                    </div>
+                </div>`;
+            chatWindow.insertAdjacentHTML('beforeend', userHTML);
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+            
+            const responseId = 'ai-response-' + msgIndex;
+            msgIndex++;
+
+            const botPlaceholderHTML = `
+                <div class="flex items-start gap-3 max-w-3xl mr-auto animate-fade-in">
+                    <div class="h-9 w-9 rounded-xl bg-teal-50 border border-teal-100 text-teal-600 flex items-center justify-center shadow-sm shrink-0">
+                        <i class="fa-solid fa-robot text-sm"></i>
+                    </div>
+                    <div class="space-y-1">
+                        <div id="${responseId}" class="bg-white border border-slate-200 rounded-2xl rounded-tl-none p-4 shadow-sm text-sm text-slate-700 leading-relaxed italic text-slate-400">
+                            Analyzing database references...
+                        </div>
+                        <span class="text-[10px] text-slate-400 px-1 font-semibold tracking-wide uppercase">AI Health Bot</span>
+                    </div>
+                </div>`;
+            chatWindow.insertAdjacentHTML('beforeend', botPlaceholderHTML);
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+
+            const formData = new FormData();
+            formData.append('msg', userText);
+
+            fetch('/get', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.text())
+            .then(data => {
+                const targetBox = document.getElementById(responseId);
+                if (targetBox) {
+                    targetBox.innerText = data;
+                    targetBox.classList.remove('italic', 'text-slate-400');
+                    chatWindow.scrollTop = chatWindow.scrollHeight;
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching RAG response:', error);
+                const targetBox = document.getElementById(responseId);
+                if (targetBox) {
+                    targetBox.innerText = "Error: Connection timed out. Please check your data channel configuration.";
+                }
+            });
+        }
+
+        function clearChat() {
+            const chatWindow = document.getElementById('chatWindow');
+            if (chatWindow && chatWindow.firstElementChild) {
+                const welcomeMsg = chatWindow.firstElementChild.outerHTML;
+                chatWindow.innerHTML = welcomeMsg;
+            }
+        }
+    </script>
+</body>
+</html>
